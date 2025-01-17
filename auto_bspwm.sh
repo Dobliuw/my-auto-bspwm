@@ -141,7 +141,15 @@ function main(){
 		/usr/bin/mkdir /opt/kitty
 		tar -xf kitty-0.28.1-x86_64.txz
 		mv kitty /opt/kitty/
+		cp /home/$USER/.config/kitty/* /root/.config/kitty/
 		log "INFO" "Kitty updated and configurated"
+
+		# Polybar configuration
+		cd $DIR
+		sudo -u $USER mkdir /home/$USER/.config/polybar
+		cp -r  $INSTALLATION_DIR/configs/polybar/* /home/$USER/.config/polybar
+		cp $INSTALLATION_DIR/configs/polybar/fonts/* /usr/share/fonts/truetype
+		fc-cache -v
 	fi
 }
 
