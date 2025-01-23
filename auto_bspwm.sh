@@ -150,6 +150,55 @@ function main(){
 		cp -r  $INSTALLATION_DIR/configs/polybar/* /home/$USER/.config/polybar
 		cp $INSTALLATION_DIR/configs/polybar/fonts/* /usr/share/fonts/truetype
 		fc-cache -v
+
+
+		# Wallpaper configuration
+		sudo -u $USER mkdir /home/$USER/Fondos
+		random_number=$(/usr/bin/shuf -i0-9 -n1)
+		cp $INSTALLATION_DIR/wallpapers/$(echo kali-linux-wallpaper-v$(/usr/bin/shuf -i1-8 -n1).png) /home/$USER/Fondos/
+
+		# Powerlevel10k Installation
+		cd $DIR
+		sudo -u $USER git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+		echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+		# Root config
+		git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+		echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+		chown root:root /usr/local/share/zsh/site-functions/_bspc
+		usermod --shell /usr/bin/zsh root
+		usermod --shell /usr/bin/zsh $USER
+		/usr/bin/ln -s -f /home/$USER/.zshrc /root/.zshrc
+		/usr/bin/cat $INSTALLATION_DIR/configs/modern_completion_system >> /home/$USER/.zshrc
+		log "Powerlevel10k Installation and Configuration"
+
+		# Plugins downloading and installation
+		cd /usr/share
+		mkdir zsh-sudo
+		chown $USER:$USER zsh-sudo
+		cd zsh-sudo
+		(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/sudo/sudo.plugin.zsh) &
+		loading "Downloading sudo plugin"
+		chmod +x sudo.plugin.zsh
+		echo "if [ -f /usr/share/zsh-sudo/sudo.plugin.zsh ]; then
+			source /usr/share/zsh-sudo/sudo.plugin.zsh
+		fi" >> ~/.zshrc
+		log "Sudo plugin installed"
+		cd $DIR
+		(wget https://github.com/sharkdp/bat/releases/download/v0.25.0/bat_0.25.0_amd64.deb)&
+		loading "Downloading batcat plugin"
+		(dpkg -i bat_0.25.0_amd64.deb) &
+		loading "Installing batcat plugin"
+		(wget https://github.com/lsd-rs/lsd/releases/download/v1.1.5/lsd_1.1.5_amd64.deb) &
+		loading "Downloading lsd plugin"
+		(dpkg -i lsd_1.1.5_amd64.deb) &
+		loading "Installing lsd plugin"
+		(apt install locate) &
+		updatedb
+		# Custom aliases configuration in .zshrc
+		echo -e "=== CUSTOM ALIASES ===\n\n# bat\nalias cat='bat'\nalias catn='bat --style=plain'\nalias catnp='bat --style=plain --paging=never'" >> /home/$USER/.zshrc
+		echo -e "\n# ls\nalias ll='lsd -lh --group-dirs=first'\nalias la='lsd -a --group-dirs=first'\nalias l='lsd --group-dirs=first'\nalias lla='lsd -lha --group-dirs=first'\nalias ls='lsd --group-dirs=first'" >> /home/$USER/.zshrc
+
+
 	fi
 }
 
