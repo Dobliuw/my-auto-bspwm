@@ -127,7 +127,7 @@ function set_profile() {
     run_as_user "/usr/bin/mkdir -p $DIR"
 
     if [ $? -eq 0 ]; then
-        log "INFO" "Temp folder created on $DIR."
+        log "INFO" "Temp folder created on ${YELLOW}$DIR${RESET}."
         sleep 1
     else
         log "ERROR" "Failed to create temp folder."
@@ -244,8 +244,10 @@ function configure_polybar(){
     log "INFO" "Polybar configuration completed."
 
     # Adding function SETTARGET to modify the target to audit
-    echo "\n\n########## FUNCTION TO SET TARGET TO AUDIT #############\nfunction settarget(){\n    ip_address=$1\n    machine_name=$2\n    echo $ip_address $machine_name > /home/kali/.config/polybar/bin/target\n}\n" >> /home/$ORIGINAL_USER/.zshrc
-
+    target_marker="########## FUNCTION TO SET TARGET TO AUDIT #############"
+    if ! /usr/bin/grep -q "$target_marker" /home/$ORIGINAL_USER/.zshrc; then
+        echo -e "\n\n$target_marker\nfunction settarget(){\n    ip_address=$1\n    machine_name=$2\n    echo $ip_address $machine_name > /home/kali/.config/polybar/bin/target\n}\n" >> /home/$ORIGINAL_USER/.zshrc
+    fi
 }
 
 # Function to create and set a random kali linux wallpaper.
@@ -346,6 +348,49 @@ function configure_powerlevel10k() {
     sleep 2
 }
 
+# Function to install picom
+function  configure_picom(){
+    cd $DIR
+    run_as_user "/usr/bin/git clone --depth=1 https://github.com/ibhagwan/picom.git" &
+    loading "Cloning PICOM repository"
+    cd picom
+    run_as_user "/usr/bin/git submodule update --initi --recursive" &
+    loading "Updating PICOM git submodule"
+    run_as_user "/usr/bin/meson --buildtype=release . build" &
+    loading "Doing some makes"
+    run_as_user "/usr/bin/ninja -c build install" &
+    loading "Doing some ninja stuff xd"
+    /usr/bin/ninja -c build install &
+    last_ninja_PID=$!
+    loading "This is the last ninja stuff, I swear :D"
+    wait $last_ninja_PID
+
+    run_as_user "/usr/bin/mkdir -p /home/$ORIGINAL_USER/.config/picom"
+    run_as_user "/usr/bin/cp $INSTALLATION_DIR/configs/picom/picom.conf /home/$ORIGINAL_USER/.config/picom/picom.conf"
+
+    if [[ "$?" -eq 0 ]]; then
+        log "INFO" "PICOM successfully installed"
+        sleep 0.5
+    else
+        log "ERROR" "An error ocurred installing PICOM, try use -v option"
+        sleep 0.5
+    fi
+
+    /usr/bin/mkdir -p /home/$ORIGINAL_USER/.config/rofi/
+    cd $DIR
+    run_as_user "git clone https://github.com/VaughnValle/blue-sky.git" & 
+    loading "Cloning BLUE-SKY repository to get NORD theme for ROFI."
+    run_as_user "/usr/bin/cp ./blue-sky/nord.rasi /home/$ORIGINAL_USER/.config/rofi/"
+    run_as_user "/usr/bin/mv /home/$ORIGINAL_USER/.config/rofi/nord.rasi /home/$ORIGINAL_USER/.config/rofi/config.rasi"
+    run_as_user "echo 'rofi.theme: /home/$ORIGINAL_USER/.config/rofi/config.rasi' >> /home/$ORIGINAL_USER/.Xresources"
+    run_as_user "/usr/bin/xrdb -merge /home/$ORIGINAL_USER/.Xresources"
+    log "INFO" "Nord theme for ROFI has been successfully installed and set as default."
+    sleep 0.5
+    log "IMPORTANT" "If you want another theme, you can run the command ${YELLOW}rofi-theme-selector${RESET}, choose your theme and then apply it with ${YELLOW}ALT${RESET} + ${YELLOW}A${RESET}"
+    sleep 5
+}
+
+
 # Function to handle the plugin instalation and renaming
 function configure_plugins(){
 
@@ -416,7 +461,11 @@ EOF
     /usr/bin/wget "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/sudo/sudo.plugin.zsh" &>/dev/null &
     loading "Downloading latest zsh-sudo version"
     /usr/bin/chmod +x ./sudo.plugin.zsh
-    echo -e "\n\n##### ZSH SUDO (ESC + ESC = sudo at the begining) PLUGIN ######\nif [ -f /usr/share/zsh-sudo/sudo.plugin.zsh ]; then\n    source /usr/share/zsh-sudo/sudo.plugin.zsh\nfi\n" >> /home/$ORIGINAL_USER/.zshrc
+
+    zsh_sudo_marker="##### ZSH SUDO (ESC + ESC = sudo at the begining) PLUGIN ######"
+    if ! /usr/bin/grep -q "$zsh_sudo_marker" /home/$ORIGINAL_USER/.zshrc; then
+        echo -e "\n\n$zsh_sudo_marker\nif [ -f /usr/share/zsh-sudo/sudo.plugin.zsh ]; then\n    source /usr/share/zsh-sudo/sudo.plugin.zsh\nfi\n" >> /home/$ORIGINAL_USER/.zshrc
+    fi
 
     # Synchronize system files
     /bin/bash -c "updatedb $stdout_redirection" &
@@ -531,6 +580,9 @@ function main() {
 
         # Fonts Donwload and Installation
         configure_fonts
+
+        # Picom and Rofi configuration
+        configure_picom
 
         # Aplicate kitty changes for root
         /usr/bin/mkdir -p /root/.config/kitty
