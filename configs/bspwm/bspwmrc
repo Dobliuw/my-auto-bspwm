@@ -17,10 +17,10 @@ bspc rule -a mplayer2 state=floating
 bspc rule -a Kupfer.py focus=on
 bspc rule -a Screenkey manage=off
 
-vmware-user-suid-wrapper &
-feh --bg-fill /home/REPLACEME/Fondos/FondoDobliuw.png &
-picom &
-wmname LG3D &
+#vmware-user-suid-wrapper & # Uncomment this to fix shared clipboard in VMWare
+feh --bg-fill /home/dobliuw/Fondos/FondoDobliuw.png &
+# picom &
+# wmname LG3D & # Uncomment this to fix buprsuite view error
 ~/.config/polybar/./launch.sh
 bspc config border_width 0
 

@@ -122,7 +122,7 @@ super + ctrl + {Left,Down,Up,Right}
 
 # Custom resize
 alt + super + {Left,Down,Up,Right}
-    /home/REPLACEME/.config/bspwm/scripts/bspwm_resize {west,south,north,east}
+    /home/$ORIGINAL_USER/.config/bspwm/scripts/bspwm_resize {west,south,north,east}
 
 # Open firefox
 
