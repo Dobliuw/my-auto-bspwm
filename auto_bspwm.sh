@@ -246,7 +246,7 @@ function configure_polybar(){
     # Adding function SETTARGET to modify the target to audit
     target_marker="########## FUNCTION TO SET TARGET TO AUDIT #############"
     if ! /usr/bin/grep -q "$target_marker" /home/$ORIGINAL_USER/.zshrc; then
-        echo -e "\n\n$target_marker\nfunction settarget(){\n    ip_address=\$1\n    machine_name=\$2\n    echo $ip_address $machine_name > /home/kali/.config/polybar/bin/target\n}\n" >> /home/$ORIGINAL_USER/.zshrc
+        echo -e "\n\n$target_marker\nfunction settarget(){\n    ip_address=\$1\n    machine_name=\$2\n    echo $ip_address $machine_name > /home/$ORIGINAL_USER/.config/polybar/bin/target\n}\n" >> /home/$ORIGINAL_USER/.zshrc
     fi
 }
 
