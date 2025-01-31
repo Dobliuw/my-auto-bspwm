@@ -303,16 +303,17 @@ function configure_powerlevel10k() {
 
     if [[ ! -d "/home/$ORIGINAL_USER/powerlevel10k" ]]; then
         run_as_user "/usr/bin/git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /home/$ORIGINAL_USER/powerlevel10k"
+        log "INFO" "Installing powerlevel10k"
     else
         log "IMPORTANT" "Powerlevel10k already installed for ${YELLOW}$ORIGINAL_USER${RESET} user, skiping the installation."
         sleep 2
     fi
 
-    line="source /home/$ORIGINAL_USER/powerlevel10k/powerlevel10k.zsh-theme"
+    local line="source ~/powerlevel10k/powerlevel10k.zsh-theme"
     /usr/bin/cat /home/$ORIGINAL_USER/.zshrc | /usr/bin/grep -q $line || echo "$line" >> /home/$ORIGINAL_USER/.zshrc
 
     if [[ ! -d "/root/powerlevel10k" ]]; then
-        /bin/bash -c "/usr/bin/git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /root/powerlevel10k $stdout_redirection" &
+        /bin/bash -c "/usr/bin/git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /root/powerlevel10k" &
         loading "Cloning POWERLEVEL10k repository for user ROOT"
         log "INFO" "POWERLEVEL10k Repository successfully cloned"
         sleep 0.5
@@ -328,8 +329,6 @@ function configure_powerlevel10k() {
     #/usr/bin/kill $ZSH_PID 2>/dev/null
     #/usr/bin/kill $ZSH_PRIVILEGED_PID 2>/dev/null
     #compaudit
-
-    /usr/bin/cat /root/.zshrc | /usr/bin/grep -q $line || echo "$line" >> /root/.zshrc
 
     run_as_user "/usr/bin/chown $ORIGINAL_USER:$ORIGINAL_USER -R /home/$ORIGINAL_USER/powerlevel10k"
     log "INFO" "Powerlevel10k installation completed."
@@ -541,7 +540,7 @@ function main() {
 	# Create work directory
         set_profile
 
-	log "INFO" "Starting with bspwm hacking enviroment configuration for user $ORIGINAL_USER and root."
+	log "INFO" "Starting with bspwm hacking enviroment configuration for user ${YELLOW}$ORIGINAL_USER${RESET} and ${YELLOW}root${RESET}."
 	sleep 0.5
 
         # Updating
