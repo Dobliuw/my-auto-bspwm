@@ -70,7 +70,7 @@ libxcb-damage0-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-render-util0-dev 
 libxcb-render0-dev libxcb-composite0-dev libxcb-image0-dev libxcb-present-dev \
 libxcb-xinerama0-dev libpixman-1-dev libdbus-1-dev libconfig-dev \
 libgl1-mesa-dev libpcre2-dev libevdev-dev uthash-dev libev-dev libx11-xcb-dev \
-libxcb-glx0-dev rofi zsh imagemagick zsh-autosuggestions zsh-syntax-highlighting \
+libxcb-glx0-dev rofi zsh imagemagick zsh-autosuggestions zsh-syntax-highlighting libpcre3-dev \
 feh locate flameshot ranger bspwm moreutils sxhkd lemonbar xdo jq net-tools curl)
 
 ############################################################################################
@@ -246,7 +246,7 @@ function configure_polybar(){
     # Adding function SETTARGET to modify the target to audit
     target_marker="########## FUNCTION TO SET TARGET TO AUDIT #############"
     if ! /usr/bin/grep -q "$target_marker" /home/$ORIGINAL_USER/.zshrc; then
-        echo -e "\n\n$target_marker\nfunction settarget(){\n    ip_address=$1\n    machine_name=$2\n    echo $ip_address $machine_name > /home/kali/.config/polybar/bin/target\n}\n" >> /home/$ORIGINAL_USER/.zshrc
+        echo -e "\n\n$target_marker\nfunction settarget(){\n    ip_address=\$1\n    machine_name=\$2\n    echo $ip_address $machine_name > /home/kali/.config/polybar/bin/target\n}\n" >> /home/$ORIGINAL_USER/.zshrc
     fi
 }
 
@@ -351,39 +351,46 @@ function configure_powerlevel10k() {
 # Function to install picom
 function  configure_picom(){
     cd $DIR
-    run_as_user "/usr/bin/git clone --depth=1 https://github.com/ibhagwan/picom.git" &
+    run_as_user "/usr/bin/git clone --depth=1 https://github.com/ibhagwan/picom.git &>/dev/null" &
     loading "Cloning PICOM repository"
     cd picom
-    run_as_user "/usr/bin/git submodule update --initi --recursive" &
+    run_as_user "/usr/bin/git submodule update --init --recursive &>/dev/null" &
     loading "Updating PICOM git submodule"
-    run_as_user "/usr/bin/meson --buildtype=release . build" &
+    run_as_user "/usr/bin/meson --buildtype=release . build &>/dev/null" &
     loading "Doing some makes"
-    run_as_user "/usr/bin/ninja -c build install" &
+    run_as_user "/usr/bin/ninja -C build &>/dev/null" &
     loading "Doing some ninja stuff xd"
-    /usr/bin/ninja -c build install &
+    /usr/bin/ninja -C build install &>/dev/null &
     last_ninja_PID=$!
     loading "This is the last ninja stuff, I swear :D"
     wait $last_ninja_PID
-
-    run_as_user "/usr/bin/mkdir -p /home/$ORIGINAL_USER/.config/picom"
-    run_as_user "/usr/bin/cp $INSTALLATION_DIR/configs/picom/picom.conf /home/$ORIGINAL_USER/.config/picom/picom.conf"
 
     if [[ "$?" -eq 0 ]]; then
         log "INFO" "PICOM successfully installed"
         sleep 0.5
     else
-        log "ERROR" "An error ocurred installing PICOM, try use -v option"
+        log "ERROR" "An error ocurred installing PICOM, try use ${YELLOW}-v${RESET} option"
         sleep 0.5
     fi
 
-    /usr/bin/mkdir -p /home/$ORIGINAL_USER/.config/rofi/
+    run_as_user "/usr/bin/mkdir -p /home/$ORIGINAL_USER/.config/picom/"
+    run_as_user "/usr/bin/cp $INSTALLATION_DIR/configs/picom/picom.conf /home/$ORIGINAL_USER/.config/picom/picom.conf"
+
+    log "INFO" "Setting up Nord theme for ROFI"
+    run_as_user "/usr/bin/mkdir -p /home/$ORIGINAL_USER/.config/rofi/"
     cd $DIR
-    run_as_user "git clone https://github.com/VaughnValle/blue-sky.git" & 
+    run_as_user "git clone https://github.com/VaughnValle/blue-sky.git &>/dev/null" & 
     loading "Cloning BLUE-SKY repository to get NORD theme for ROFI."
-    run_as_user "/usr/bin/cp ./blue-sky/nord.rasi /home/$ORIGINAL_USER/.config/rofi/"
-    run_as_user "/usr/bin/mv /home/$ORIGINAL_USER/.config/rofi/nord.rasi /home/$ORIGINAL_USER/.config/rofi/config.rasi"
+    run_as_user "/usr/bin/cp ./blue-sky/nord.rasi /home/$ORIGINAL_USER/.config/rofi/config.rasi"
+
+    # Delete another "rofi.theme" entries sin .Xresources
+    run_as_user "/usr/bin/sed -i '/rofi.theme/d' /home/$ORIGINAL_USER/.Xresources"
+
+    # Add the correct configuration
     run_as_user "echo 'rofi.theme: /home/$ORIGINAL_USER/.config/rofi/config.rasi' >> /home/$ORIGINAL_USER/.Xresources"
-    run_as_user "/usr/bin/xrdb -merge /home/$ORIGINAL_USER/.Xresources"
+
+    # Apply the configuration
+    run_as_user "/usr/bin/xrdb -merge /home/$ORIGINAL_USER/.Xresources &>/dev/null"
     log "INFO" "Nord theme for ROFI has been successfully installed and set as default."
     sleep 0.5
     log "IMPORTANT" "If you want another theme, you can run the command ${YELLOW}rofi-theme-selector${RESET}, choose your theme and then apply it with ${YELLOW}ALT${RESET} + ${YELLOW}A${RESET}"

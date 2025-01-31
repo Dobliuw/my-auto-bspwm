@@ -19,8 +19,8 @@ bspc rule -a Screenkey manage=off
 
 #vmware-user-suid-wrapper & # Uncomment this to fix shared clipboard in VMWare
 feh --bg-fill /home/dobliuw/Fondos/FondoDobliuw.png &
-# picom &
-# wmname LG3D & # Uncomment this to fix buprsuite view error
+picom & 
+wmname LG3D & # Uncomment this to fix buprsuite view error
 ~/.config/polybar/./launch.sh
 bspc config border_width 0
 
