@@ -406,7 +406,7 @@ function configure_plugins(){
         log "INFO" "Modern completion system already in use (Found in ${YELLOW}~/.zshrc${RESET})"
         sleep 1
     else
-        cat <<EOF >> /home/$ORIGINAL_USER/.zshrc
+        /usr/bin/cat <<EOF >> /home/$ORIGINAL_USER/.zshrc
 
 $marker
 autoload -Uz compinit
@@ -488,6 +488,45 @@ EOF
         log "INFO" "Custom aliases already added in ${YELLOW}~/.zshrc${RESET}"
         sleep 1
     fi
+
+    # Pentesting functions 
+    local pentesting_marker="############# PENTESTING FUNCTIONS #################"
+    if ! /usr/bin/grep -q "$pentesting_marker" /home/$ORIGINAL_USER/.zshrc; then
+        /usr/bin/cat <<EOF >> /home/$ORIGINAL_USER/.zshrc
+# Make work directory
+function mkt(){
+    target=$1
+    mkdir -p ./$($target)_inventory/{Recon/{Network/NetworkMap,Web/{HTTP,HTTPS},Services},Exploits,Vulnerabilities,Scans/{Reconnaissance,PostExplotation},Loot,Reports}
+
+# EXAMPLE 
+# {main directory}
+#    ├── 189.154.48.12_inventory/
+#    │   ├── Recon/
+#    │   │   ├── Network/
+#    │   │   │   ├── NetworkMap
+#    │   │   ├── Web/
+#    │   │   │   ├── HTTP
+#    │   │   │   ├── HTTPS
+#    │   │   ├── Services/
+#    │   │   │   ├── SMB/ {Create each one and dump data inside}
+#    │   │   │   ├── RDP/ {Create each one and dump data inside}
+#    │   │   │   ├── FTP/ {Create each one and dump data inside}
+#    │   ├── Exploits/
+#    │   ├── Vulnerabilities/
+#    │   ├── Scans/
+#    │   │   ├── Reconnaissance/
+#    │   │   ├── PostExplotation/
+#    │   ├── Loot/
+#    │   ├── Reports/
+}
+EOF
+        log "INFO" "Pentesting functions configured successfully"
+        sleep 1 
+    else
+        log "INFO" "Custom pentesting functions already added in ${YELLOW}~/.zshrc${RESET}"
+        sleep 1
+    fi
+
 }
 
 
