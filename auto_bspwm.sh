@@ -495,8 +495,7 @@ EOF
         /usr/bin/cat <<EOF >> /home/$ORIGINAL_USER/.zshrc
 # Make work directory
 function mkt(){
-    target=$1
-    mkdir -p ./$($target)_inventory/{Recon/{Network/NetworkMap,Web/{HTTP,HTTPS},Services},Exploits,Vulnerabilities,Scans/{Reconnaissance,PostExplotation},Loot,Reports}
+    mkdir -p ./Inventory/{Recon/{Network/NetworkMap,Web/{HTTP,HTTPS},Services},Exploits,Vulnerabilities,Scans/{Reconnaissance,PostExplotation},Loot,Reports}
 
 # EXAMPLE 
 # {main directory}
