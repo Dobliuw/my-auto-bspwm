@@ -219,12 +219,29 @@ function configure_sxhkd(){
     log "INFO" "SXHKD configuration completed."
 }
 
+# Function to get resolution
+function get_resolution(){
+    res=$(xrandr | grep '*' | awk '{print $1}' )
+    width=${res%x*}
+    height=${res#*x}
+
+    if [ "$width" -lt 1920 ] && [ "$height" -lt 1080 ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
 # Function to download, install and configure POLYBAR
 function configure_polybar(){
     cd $DIR
     run_as_user "/usr/bin/git clone --recursive https://github.com/polybar/polybar" &
     loading "Cloning POLYBAR repository"
     log "INFO" "POLYBAR Repository successfully cloned"
+
+    # Verify if notebook to apply diferent configuration
+    get_resolution && folder="notebook_polybar" || folder="polybar"
+
     cd polybar
     run_as_user "/usr/bin/mkdir build" &
     loading "POLYBAR Initial installation"
@@ -235,7 +252,7 @@ function configure_polybar(){
     run_as_user "/usr/bin/mkdir -p /home/$ORIGINAL_USER/.config/polybar"
     /bin/bash -c "/usr/bin/make install $stdout_redirection" &
     loading "POLYBAR Final installation"
-    run_as_user "/usr/bin/cp -r $INSTALLATION_DIR/configs/polybar/* /home/$ORIGINAL_USER/.config/polybar/"
+    run_as_user "/usr/bin/cp -r $INSTALLATION_DIR/configs/$folder/* /home/$ORIGINAL_USER/.config/polybar/"
     /usr/bin/cp -r /home/$ORIGINAL_USER/.config/polybar/fonts/* /usr/share/fonts/truetype
     /usr/bin/chmod +x /home/$ORIGINAL_USER/.config/polybar/launch.sh
     /usr/bin/chmod +x /home/$ORIGINAL_USER/.config/polybar/bin/*
