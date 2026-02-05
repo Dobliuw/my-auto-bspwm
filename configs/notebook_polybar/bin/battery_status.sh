@@ -1,8 +1,6 @@
 #!/usr/bin/bash
 
 BAT=$(upower -e | grep 'BAT') 
-PERCENT=$(upower -i "$BAT" | awk '/percentage/ {gsub("%",""); print $2}')
-STATE=$(upower -i "$BAT" | awk '/state/ {print $2}')
 
 ICON_COLOR="%{F#32CD32}"
 TEXT_COLOR="%{F#FFFFFF}"
@@ -17,6 +15,9 @@ ICONS=("$ICON_EMPTY" "$ICON_LOW" "$ICON_MED" "$ICON_SEMFULL" "$ICON_FULL")
 
 
 print_battery(){
+
+    PERCENT=$(upower -i "$BAT" | awk '/percentage/ {gsub("%",""); print $2}')
+    STATE=$(upower -i "$BAT" | awk '/state/ {print $2}')
 
     if [ "$STATE" = "charging" ]; then
         INDEX=$(( $(date +%s) % ${#ICONS[@]} ))
