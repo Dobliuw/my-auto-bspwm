@@ -2,7 +2,9 @@
 
 BAT=$(upower -e | grep 'BAT') 
 
-ICON_COLOR="%{F#32CD32}"
+ICON_COLOR_GOOD="%{F#32CD32}"
+ICON_COLOR_MID="%{F#FFA500}"
+ICON_COLOR_BAD="%{F#FF0000}"
 TEXT_COLOR="%{F#FFFFFF}"
 
 ICON_FULL="" #"<U+F0240>"
@@ -25,12 +27,16 @@ print_battery(){
     else
         if [ "$PERCENT" -gt 90 ]; then
             ICON="$ICON_FULL"
+            ICON_COLOR="$ICON_COLOR_GOOD"
         elif [ "$PERCENT" -gt 55 ]; then
             ICON="$ICON_SEMFULL"
+            ICON_COLOR="$ICON_COLOR_GOOD"
         elif [ "$PERCENT" -gt 25 ]; then
             ICON="$ICON_MED"
+            ICON_COLOR="$ICON_COLOR_MID"
         else
             ICON="$ICON_LOW"
+            ICON_COLOR="$ICON_COLOR_BAD"
         fi
     fi
 
