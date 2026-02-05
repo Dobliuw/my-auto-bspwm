@@ -24,6 +24,7 @@ print_battery(){
     if [ "$STATE" = "charging" ]; then
         INDEX=$(( $(date +%s) % ${#ICONS[@]} ))
         ICON="${ICONS[$INDEX]}"
+        ICON_COLOR="$ICON_COLOR_GOOD"
     else
         if [ "$PERCENT" -gt 90 ]; then
             ICON="$ICON_FULL"
