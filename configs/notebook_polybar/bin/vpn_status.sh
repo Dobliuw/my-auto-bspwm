@@ -2,10 +2,10 @@
 
 last_state=""
 ip=1
+vpn_country=""
 
 while true; do
 
-    # En vez de guardar texto, guardamos el exit status (0 o 1)
     /usr/sbin/ifconfig | /usr/bin/grep -qi "nordlynx"
     nordvpn=$?
 
@@ -14,6 +14,10 @@ while true; do
 
     if [ "$nordvpn" -eq 0 ] || [ "$other_vpn" -eq 0 ]; then
         current_state="connected"
+	vpn_country2=$(/usr/bin/nordvpn status | /usr/bin/grep -i country | /usr/bin/sed 's/Country://')
+	if [ "$nordvpn" ] && [ "$vpn_country" != "$vpn_country2" ]; then
+            ip=$(curl -s https://api.ipify.org)
+	fi
     else
         current_state="disconnected"
     fi
@@ -41,6 +45,7 @@ while true; do
         fi
 
         last_state="$current_state"
+	vpn_country=$(/usr/bin/nordvpn status | /usr/bin/grep -i country | /usr/bin/sed 's/Country://')
     fi
 
     if [ "$ip" != "1" ]; then
